@@ -1,0 +1,124 @@
+<odoo>
+  <record id="view_sync_invoice_list" model="ir.ui.view">
+    <field name="name">sync.invoice.list</field>
+    <field name="model">sync.invoice</field>
+    <field name="arch" type="xml">
+      <list decoration-danger="recon_state in ('mismatched','missing')" decoration-success="recon_state == 'matched'">
+        <field name="external_id"/>
+        <field name="partner_name"/>
+        <field name="invoice_date"/>
+        <field name="amount"/>
+        <field name="ledger_amount"/>
+        <field name="recon_state"/>
+      </list>
+    </field>
+  </record>
+
+  <record id="view_sync_invoice_pivot" model="ir.ui.view">
+  <field name="name">sync.invoice.pivot</field>
+  <field name="model">sync.invoice</field>
+  <field name="arch" type="xml">
+    <pivot>
+      <field name="partner_name" type="row"/>
+      <field name="recon_state" type="col"/>
+      <field name="amount" type="measure"/>
+      <field name="ledger_amount" type="measure"/>
+    </pivot>
+  </field>
+</record>
+
+  <record id="view_sync_invoice_form" model="ir.ui.view">
+    <field name="name">sync.invoice.form</field>
+    <field name="model">sync.invoice</field>
+    <field name="arch" type="xml">
+      <form>
+        <header>
+          <button name="action_reconcile" type="object" string="Reconcile" class="btn-primary"/>
+          <field name="recon_state" widget="statusbar"/>
+        </header>
+        <sheet>
+          <group>
+            <field name="external_id"/>
+            <field name="partner_name"/>
+            <field name="invoice_date"/>
+            <field name="amount"/>
+            <field name="ledger_amount"/>
+          </group>
+        </sheet>
+        <chatter/>
+      </form>
+    </field>
+  </record>
+
+  <record id="view_sync_invoice_search" model="ir.ui.view">
+  <field name="name">sync.invoice.search</field>
+  <field name="model">sync.invoice</field>
+  <field name="arch" type="xml">
+    <search>
+      <field name="external_id"/>
+      <field name="partner_name"/>
+      <filter name="issues" string="Needs attention"
+              domain="[('recon_state','in',['mismatched','missing'])]"/>
+      <group expand="0">
+        <filter name="by_state" string="Status"
+                context="{'group_by': 'recon_state'}"/>
+      </group>
+    </search>
+  </field>
+</record>
+
+<record id="view_sync_log_search" model="ir.ui.view">
+  <field name="name">sync.log.search</field>
+  <field name="model">sync.log</field>
+  <field name="arch" type="xml">
+    <search>
+      <field name="source"/>
+      <field name="error"/>
+      <filter name="failed_runs" string="Failed runs"
+              domain="[('status','in',['failed','partial'])]"/>
+      <filter name="successful" string="Successful"
+              domain="[('status','=','success')]"/>
+      <separator/>
+      <filter name="today" string="Today"
+              domain="[('run_date','&gt;=',context_today().strftime('%Y-%m-%d'))]"/>
+      <group expand="0">
+        <filter name="by_status" string="Status"
+                context="{'group_by': 'status'}"/>
+        <filter name="by_day" string="Day"
+                context="{'group_by': 'run_date:day'}"/>
+      </group>
+    </search>
+  </field>
+</record>
+
+  <record id="view_sync_log_list" model="ir.ui.view">
+    <field name="name">sync.log.list</field>
+    <field name="model">sync.log</field>
+    <field name="arch" type="xml">
+      <list decoration-danger="status == 'failed'" decoration-success="status == 'success'">
+        <field name="run_date"/>
+        <field name="source"/>
+        <field name="status"/>
+        <field name="created_count"/>
+        <field name="updated_count"/>
+        <field name="error_count"/>
+        <field name="error"/>
+      </list>
+    </field>
+  </record>
+
+  <record id="action_sync_invoice" model="ir.actions.act_window">
+    <field name="name">Invoices</field>
+    <field name="res_model">sync.invoice</field>
+    <field name="view_mode">list,form,pivot</field>
+  </record>
+  <record id="action_sync_log" model="ir.actions.act_window">
+    <field name="name">Sync Logs</field>
+    <field name="res_model">sync.log</field>
+    <field name="view_mode">list</field>
+  </record>
+
+  <menuitem id="menu_invoice_sync_root" name="Invoice Sync" sequence="50"/>
+  <menuitem id="menu_sync_invoice" parent="menu_invoice_sync_root" name="Invoices" action="action_sync_invoice" sequence="1"/>
+  <menuitem id="menu_sync_log" parent="menu_invoice_sync_root" name="Sync Logs" action="action_sync_log" sequence="2"/>
+</odoo>

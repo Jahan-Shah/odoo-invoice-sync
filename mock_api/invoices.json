@@ -1,0 +1,5 @@
+[
+  {"id": 1001, "client": "AB Trading", "amount": 5400.00, "date": "2026-09-01", "ledger_amount": 5400.00},
+  {"id": 1002, "client": "MP Logistics", "amount": 1200.50, "date": "2026-09-03", "ledger_amount": 1000.50},
+  {"id": 1003, "client": "Alfa Supplies", "amount": 980.00, "date": "2026-09-05", "ledger_amount": 0}
+]
